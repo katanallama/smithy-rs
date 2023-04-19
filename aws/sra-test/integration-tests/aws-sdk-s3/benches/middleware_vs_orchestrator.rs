@@ -176,11 +176,7 @@ mod orchestrator {
                 ),
             );
 
-            cfg.set_endpoint_resolver(DefaultEndpointResolver::new(
-                aws_smithy_http::endpoint::SharedEndpointResolver::new(
-                    self.endpoint_resolver.clone(),
-                ),
-            ));
+            cfg.set_endpoint_resolver(DefaultEndpointResolver::new(self.endpoint_resolver.clone()));
 
             let params_builder = aws_sdk_s3::endpoint::Params::builder()
                 .set_region(Some("us-east-1".to_owned()))
