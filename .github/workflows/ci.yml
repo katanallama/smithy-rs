@@ -189,6 +189,8 @@ jobs:
       with:
         toolchain: ${{ env.rust_version }}
         components: ${{ env.rust_toolchain_components }}
+    - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+    - run: vcpkg install openssl:x64-windows-static-md
     - name: Run tests
       shell: bash
       run: |
