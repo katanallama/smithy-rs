@@ -158,8 +158,8 @@ class ServiceRuntimePluginGenerator(
                     if let Some(connection) = self.handle.conf.http_connector()
                             .and_then(|c| c.connector(&connector_settings, sleep_impl.clone()))
                             .or_else(|| #{default_connector}(&connector_settings, sleep_impl)) {
-                        let connection: #{Box}<dyn #{Connection}> = #{Box}::new(#{DynConnectorAdapter}::new(
-                            // TODO(enableNewSmithyRuntimeCleanup): Replace the tower-based DynConnector and remove DynConnectorAdapter when deleting the middleware implementation
+                        let connection: #{Arc}<dyn #{Connection}> = #{Arc}::new(#{DynConnectorAdapter}::new(
+                            // TODO(enableNewSmithyRuntime): Replace the tower-based DynConnector and remove DynConnectorAdapter when deleting the middleware implementation
                             connection
                         )) as _;
                         cfg.set_connection(connection);

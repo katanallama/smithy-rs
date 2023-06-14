@@ -600,7 +600,7 @@ impl SharedInterceptor {
         Self {
             interceptor: Arc::new(interceptor),
             check_enabled: Arc::new(|conf: &ConfigBag| {
-                conf.get::<DisableInterceptor<T>>().is_none()
+                conf.get::<Arc<DisableInterceptor<T>>>().is_none()
             }),
         }
     }
@@ -726,11 +726,11 @@ pub struct DisableInterceptor<T> {
 }
 
 /// Disable an interceptor with a given cause
-pub fn disable_interceptor<T: Interceptor>(cause: &'static str) -> DisableInterceptor<T> {
-    DisableInterceptor {
+pub fn disable_interceptor<T: Interceptor>(cause: &'static str) -> Arc<DisableInterceptor<T>> {
+    Arc::new(DisableInterceptor {
         _t: PhantomData::default(),
         cause,
-    }
+    })
 }
 
 impl Interceptors {
