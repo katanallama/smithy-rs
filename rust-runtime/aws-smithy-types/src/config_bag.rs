@@ -80,7 +80,7 @@ impl<T: Default> Default for Value<T> {
 }
 
 /// A named layer comprising a config bag
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Layer {
     name: Cow<'static, str>,
     props: TypeIdMap<TypeErasedCloneableBox>,
