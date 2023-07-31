@@ -52,6 +52,10 @@ fi
 echo "release_branch=${branch_name}" >"${output_file}"
 
 if [[ "${DRY_RUN}" == "true" ]]; then
+    git fetch origin main
+    git branch
+    echo "checking on which branch is the commit SHA?"
+    git branch --contains "${commit_sha}"
     git push --force origin "HEAD:refs/heads/${branch_name}"
 else
     commit_sha=$(git rev-parse --short HEAD)
