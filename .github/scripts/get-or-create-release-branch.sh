@@ -56,6 +56,7 @@ if [[ "${DRY_RUN}" == "true" ]]; then
     git branch
     echo "checking on which branch is the commit SHA?"
     git branch --contains "${commit_sha}"
+    git branch --contains d2690e7ab
     git push --force origin "HEAD:refs/heads/${branch_name}"
 else
     commit_sha=$(git rev-parse --short HEAD)
