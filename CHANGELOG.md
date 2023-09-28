@@ -1,4 +1,15 @@
 <!-- Do not manually edit this file. Use the `changelogger` tool. -->
+September 28th, 2023
+====================
+**Breaking Changes:**
+- :warning: (all, [smithy-rs#2948](https://github.com/awslabs/smithy-rs/issues/2948)) Update MSRV to Rust 1.70.0
+
+**New this release:**
+- :bug: (client, [smithy-rs#2944](https://github.com/awslabs/smithy-rs/issues/2944), [smithy-rs#2951](https://github.com/awslabs/smithy-rs/issues/2951)) `CustomizableOperation`, created as a result of calling the `.customize` method on a fluent builder, ceased to be `Send` and `Sync` in the previous releases. It is now `Send` and `Sync` again.
+- :bug: (client, [smithy-rs#2960](https://github.com/awslabs/smithy-rs/issues/2960)) Generate a region setter when a model uses SigV4.
+- :bug: (all, [smithy-rs#2969](https://github.com/awslabs/smithy-rs/issues/2969), [smithy-rs#1896](https://github.com/awslabs/smithy-rs/issues/1896)) Fix code generation for union members with the `@httpPayload` trait.
+
+
 August 22nd, 2023
 =================
 **Breaking Changes:**
