@@ -8,7 +8,7 @@ use crate::package::discover_and_validate_package_batches;
 use crate::subcommand::fix_manifests::Versions;
 use anyhow::{anyhow, bail, Result};
 use semver::Version;
-use smithy_rs_tool_common::package::PackageCategory;
+use smithy_rs_tool_common::package::{PackageCategory, PackageStability};
 use std::path::Path;
 use tracing::info;
 
@@ -26,13 +26,24 @@ pub(super) fn validate_before_fixes(
     }
 
     info!("Pre-validation manifests...");
-    let expected_runtime_version = versions
+
+    let expected_stable_runtime_version = versions
         .get("aws-smithy-types")
         .ok_or_else(|| anyhow!("`aws-smithy-types` crate missing"))?;
+
+    let expected_dev_preview_runtime_version = versions
+        .get("aws-smithy-http")
+        .ok_or_else(|| anyhow!("`aws-smithy-http` crate missing"))?;
 
     for (name, version) in versions.published_crates() {
         let category = PackageCategory::from_package_name(name);
         if category == PackageCategory::SmithyRuntime || category == PackageCategory::AwsRuntime {
+            let expected_runtime_version =
+                if PackageStability::from_package_name(name) == PackageStability::Stable {
+                    expected_stable_runtime_version
+                } else {
+                    expected_dev_preview_runtime_version
+                };
             confirm_version(name, expected_runtime_version, version)?;
         }
     }
@@ -98,52 +109,48 @@ mod test {
     #[test]
     fn pre_validate() {
         expect_success(&[
-            ("aws-config", "0.35.1"),
-            ("aws-sdk-s3", "0.5.1"),
-            ("aws-smithy-types", "0.35.1"),
-            ("aws-types", "0.35.1"),
-        ]);
-
-        expect_success(&[
-            ("aws-smithy-types", "0.35.1"),
+            ("aws-config", "1.5.2"),
             ("aws-smithy-http", "0.35.1"),
-            ("aws-smithy-client", "0.35.1"),
+            ("aws-sdk-s3", "1.5.2"),
+            ("aws-smithy-types", "1.5.2"),
+            ("aws-types", "1.5.2"),
         ]);
 
+        expect_success(&[("aws-smithy-types", "1.5.2"), ("aws-smithy-http", "0.35.1")]);
+
         expect_failure(
-            "Crate named `aws-smithy-http` should be at version `0.35.1` but is at `0.35.0`",
+            "Crate named `aws-smithy-runtime-api` should be at version `1.5.3` but is at `1.5.2`",
             &[
-                ("aws-smithy-types", "0.35.1"),
+                ("aws-smithy-runtime-api", "1.5.2"),
+                ("aws-smithy-types", "1.5.3"),
                 ("aws-smithy-http", "0.35.0"),
-                ("aws-smithy-client", "0.35.1"),
             ],
         );
 
         expect_success(&[
-            ("aws-config", "0.35.1"),
-            ("aws-sdk-s3", "0.5.0"),
-            ("aws-smithy-types", "0.35.1"),
-            ("aws-types", "0.35.1"),
+            ("aws-config", "1.5.2"),
+            ("aws-sdk-s3", "1.5.2"),
+            ("aws-smithy-http", "0.35.0"),
+            ("aws-smithy-types", "1.5.2"),
+            ("aws-types", "1.5.2"),
         ]);
 
         expect_failure(
-            "Crate named `aws-types` should be at version `0.35.1` but is at `0.35.0`",
+            "Crate named `aws-types` should be at version `1.5.3` but is at `1.5.2`",
             &[
-                ("aws-config", "0.35.1"),
-                ("aws-sdk-s3", "0.5.1"),
-                ("aws-smithy-types", "0.35.1"),
-                ("aws-types", "0.35.0"),
+                ("aws-config", "1.5.3"),
+                ("aws-sdk-s3", "1.5.3"),
+                ("aws-smithy-http", "0.35.0"),
+                ("aws-smithy-types", "1.5.3"),
+                ("aws-types", "1.5.2"),
             ],
         );
 
-        expect_failure(
-            "Crate named `aws-smithy-http` should be at version `0.35.1` but is at `0.35.0`",
-            &[
-                ("aws-config", "0.35.1"),
-                ("aws-sdk-s3", "0.5.1"),
-                ("aws-smithy-types", "0.35.1"),
-                ("aws-smithy-http", "0.35.0"),
-            ],
-        );
+        expect_success(&[
+            ("aws-config", "1.5.3"),
+            ("aws-sdk-s3", "1.5.3"),
+            ("aws-smithy-types", "1.5.3"),
+            ("aws-smithy-http", "0.35.0"),
+        ]);
     }
 }

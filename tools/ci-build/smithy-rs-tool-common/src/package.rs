@@ -35,3 +35,37 @@ impl PackageCategory {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PackageStability {
+    Stable,
+    DevPreview,
+}
+
+impl PackageStability {
+    pub fn from_package_name(name: &str) -> Self {
+        if name.starts_with(SMITHY_PREFIX) {
+            if ["async", "runtime-api", "types"]
+                .iter()
+                .any(|suffix| name.ends_with(*suffix))
+            {
+                PackageStability::Stable
+            } else {
+                PackageStability::DevPreview
+            }
+        } else if name.starts_with(SDK_PREFIX) {
+            PackageStability::Stable
+        } else if name.starts_with("aws-") {
+            if ["config", "credential-types", "types"]
+                .iter()
+                .any(|suffix| name.ends_with(*suffix))
+            {
+                PackageStability::Stable
+            } else {
+                PackageStability::DevPreview
+            }
+        } else {
+            PackageStability::Stable
+        }
+    }
+}
