@@ -48,7 +48,7 @@ pub async fn subcommand_upgrade_runtime_crates_version(
     let updated_gradle_properties = update_gradle_properties(
         &gradle_properties,
         &upgraded_preview_version,
-        &*PREVIEW_VERSION_REGEX,
+        &PREVIEW_VERSION_REGEX,
     )
     .with_context(|| {
         format!(
@@ -62,7 +62,7 @@ pub async fn subcommand_upgrade_runtime_crates_version(
         update_gradle_properties(
             &updated_gradle_properties,
             &upgraded_stable_version,
-            &*STABLE_VERSION_REGEX,
+            &STABLE_VERSION_REGEX,
         )
         .with_context(|| {
             format!(
@@ -82,9 +82,9 @@ pub async fn subcommand_upgrade_runtime_crates_version(
     Ok(())
 }
 
-fn update_gradle_properties<'a, 'b>(
+fn update_gradle_properties<'a>(
     gradle_properties: &'a str,
-    upgraded_version: &'b semver::Version,
+    upgraded_version: &semver::Version,
     version_regex: &Regex,
 ) -> Result<Cow<'a, str>, anyhow::Error> {
     let current_version = version_regex
